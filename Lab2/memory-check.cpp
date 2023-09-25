@@ -23,7 +23,6 @@ int main()
     int *memoryBytes = new int[size];
     array->array = memoryBytes;
     array->size = size;
-    // Pointer to first memory element.
 
     initArray(array);
     printArray(array);
@@ -66,49 +65,56 @@ void setMemory(arrayStruct *memory)
     int *lastByte = &memory->array[memory->size - 1] + 1;
     // Seed random to current time.
     srand(time(NULL));
-    int program = 1;
+
+    // keeps track of the program number.
+    int programNumber = 1;
+
+    // while not at the end of the memory array.
     while (currentByte < lastByte)
     {
+        // for each byte of memory a programNumber allocates.
         for (int i = 0; i < rand() % 3 + 1; i++)
         {
+            // if no space in the memory, do not allocate.
             if (currentByte == lastByte)
             {
                 break;
             }
-            *currentByte = program;
-            if (currentByte + 1 == lastByte)
-            {
-                return;
-            }
-            else
-            {
-                currentByte++;
-            }
+
+            // sets current space to the current program number and updates current byte.
+            *currentByte = programNumber;
+            currentByte++;
         }
-        program++;
+        // increments program number.
+        programNumber++;
     }
 }
 
 void printMemory(arrayStruct *memory)
 {
+    // Mapping <programNumber,amountOfMemory>
     std::map<int, int> memoryAllocation;
 
     // Find how many bytes each array took up.
     for (int i = 0; i < memory->size; i++)
     {
         int programNum = memory->array[i];
+        // if programNumber exists in the map
         if (memoryAllocation.find(programNum) != memoryAllocation.end())
         {
             memoryAllocation[programNum] = memoryAllocation[programNum] + 1;
         }
+        // otherwise create the key.
         else
         {
             memoryAllocation[programNum] = 1;
         }
     }
 
+    // Print out memory amount for each programNumber
     for (auto it = memoryAllocation.begin(); it != memoryAllocation.end(); it++)
     {
+        // Prints the memory allocation for each program number.
         printf("Program %d required %d bytes of memory.\n", it->first, it->second);
         printArray(memory);
     }
