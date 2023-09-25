@@ -7,7 +7,7 @@ int main()
 {
     std::string command = DEFAULT_VALUE;
     int numOfFiles = 0;
-    std::cout << "Welcome to the tiny shell! the worlds best shell!" << std::endl;
+    std::cout << "Welcome to the Tiny Shell! the worlds best shell!" << std::endl;
 
     while (command != "exit")
     {
@@ -36,12 +36,12 @@ int main()
         {
             std::cout << "Here are all of the available commands:\n";
             std::cout << "<-------------------------FILE IO------------------------>\n";
-            std::cout << "\"addFile\" adds one file to the system\n";
-            std::cout << "\"removeFile\" removes one file from the system\n";
+            std::cout << "\"addFile\" Adds one file to the system.\n";
+            std::cout << "\"removeFile\" Removes one file from the system.\n";
             std::cout << "\"countFile\" Counts the number of files in the system.\n";
             std::cout << "<-------------------------SYSTEM------------------------->\n";
-            std::cout << "\"help\" displays this helpful menu!\n";
-            std::cout << "\"exit\" exit tiny shell\n";
+            std::cout << "\"help\" Displays this helpful menu!\n";
+            std::cout << "\"exit\" Exit tiny shell.\n";
         }
         else if (command != DEFAULT_VALUE)
         {
@@ -52,5 +52,6 @@ int main()
         getline(std::cin, command);
         std::cout << std::endl;
     }
+    std::cout << "Thanks for using Tiny Shell!" << std::endl;
     return 0;
 }
