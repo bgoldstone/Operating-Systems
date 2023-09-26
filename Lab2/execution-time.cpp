@@ -23,7 +23,7 @@ int main()
 /// @return time (in milliseconds) the number of instructions takes to run.
 const double calculateTime(double clockSpeed, double numberOfInstructions)
 {
-    double timeInSeconds = numberOfInstructions / clockSpeed;
-    const double timeInMilliseconds = timeInSeconds / 1000;
+    double time = numberOfInstructions / clockSpeed;
+    const double timeInMilliseconds = time / 1000;
     return timeInMilliseconds;
 }
