@@ -1,4 +1,7 @@
 #include <iostream>
+
+const double calculateTime(double clockSpeed, double numberOfInstructions);
+
 int main()
 {
     double clockSpeed;
@@ -8,8 +11,19 @@ int main()
     std::cin >> clockSpeed;
     std::cout << "Please enter the number of instructions you are computing: ";
     std::cin >> numberOfInstructions;
-    const double time = numberOfInstructions / clockSpeed / 1000;
-    printf("The time to execute instructions is : %.4f (ms).\n", time);
+    const double timeInMilliseconds = calculateTime(clockSpeed, numberOfInstructions);
+    printf("The time to execute instructions is : %.4f (ms).\n", timeInMilliseconds);
 
     return 0;
+}
+
+/// @brief Calculates the time (in milliseconds) a set number of instructions takes to run given the clock speed.
+/// @param clockSpeed Clock Speed of the Processor.
+/// @param numberOfInstructions Number of Instructions being computed.
+/// @return time (in milliseconds) the number of instructions takes to run.
+const double calculateTime(double clockSpeed, double numberOfInstructions)
+{
+    double timeInSeconds = numberOfInstructions / clockSpeed;
+    const double timeInMilliseconds = timeInSeconds / 1000;
+    return timeInMilliseconds;
 }
