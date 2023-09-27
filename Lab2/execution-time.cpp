@@ -1,3 +1,7 @@
+/// @author    Benjamin Goldstone (bgoldstone@muhlenberg.edu)
+/// @date      9/27/23
+/// @brief     This program calculates the execution time based on the number of instructions calculated and the clock speed of the processor.
+
 #include <iostream>
 
 const double calculateTime(double clockSpeed, double numberOfInstructions);

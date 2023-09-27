@@ -1,3 +1,7 @@
+/// @author    Benjamin Goldstone (bgoldstone@muhlenberg.edu)
+/// @date      9/27/23
+/// @brief     This program "initializes" memory for some programs running on the system.
+
 #include <iostream>
 #include <random>
 #include <time.h>

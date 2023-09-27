@@ -1,7 +1,9 @@
+/// @author    Benjamin Goldstone (bgoldstone@muhlenberg.edu)
+/// @date      9/27/23
+/// @brief     This program is an application representing a tiny shell.
+
 #include <iostream>
 #define DEFAULT_VALUE "DEFAULT_VALUE"
-
-void toLowerString(std::string *str);
 
 int main()
 {

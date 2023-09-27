@@ -33,3 +33,10 @@
 
 # IDEs
 .vscode/
+
+# Compressed Foramts
+*.zip
+*.7z
+*.tar.gz
+*.tar
+*.tar.xz
