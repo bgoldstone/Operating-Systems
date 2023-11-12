@@ -1,40 +1,40 @@
 #include <vector>
 #include <iostream>
-#include "FCFSProcess.hpp"
+#include "SJFProcess.hpp"
 
 #ifndef CONTEXT_SWITCH_TIME
 #define CONTEXT_SWITCH_TIME 0;
 #endif
 
-void FCFSScheduler(std::vector<FCFSProcess *> *processes);
-void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes);
-void getSizeOfVector(std::vector<FCFSProcess *> *processes);
+void SJFScheduler(std::vector<SJFProcess *> *processes);
+void printTurnaroundWaitingTime(std::vector<SJFProcess *> *processes);
+void getSizeOfVector(std::vector<SJFProcess *> *processes);
 int NUMBER_OF_PROCESSES = 0;
 
 int main()
 {
-    std::vector<FCFSProcess *> *processes = new std::vector<FCFSProcess *>;
-    processes->push_back(new FCFSProcess(1, 24, 0));
-    processes->push_back(new FCFSProcess(2, 3, 0));
-    processes->push_back(new FCFSProcess(3, 3, 0));
+    std::vector<SJFProcess *> *processes = new std::vector<SJFProcess *>;
+    processes->push_back(new SJFProcess(1, 24, 0));
+    processes->push_back(new SJFProcess(2, 3, 0));
+    processes->push_back(new SJFProcess(3, 3, 0));
 
     getSizeOfVector(processes);
 
     if (processes->size() == 0)
         exit(EXIT_FAILURE);
-    FCFSScheduler(processes);
+    SJFScheduler(processes);
     printTurnaroundWaitingTime(processes);
     delete processes;
 
     return 0;
 }
 
-void FCFSScheduler(std::vector<FCFSProcess *> *processes)
+void SJFScheduler(std::vector<SJFProcess *> *processes)
 {
     int time = 0;
     int completedProcesses = 0;
-    std::vector<FCFSProcess *> readyQueue;
-    FCFSProcess *currentProcess;
+    std::vector<SJFProcess *> readyQueue;
+    SJFProcess *currentProcess;
 
     while (NUMBER_OF_PROCESSES != completedProcesses)
     {
@@ -61,7 +61,7 @@ void FCFSScheduler(std::vector<FCFSProcess *> *processes)
     }
 }
 
-void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes)
+void printTurnaroundWaitingTime(std::vector<SJFProcess *> *processes)
 {
 
     int totalTurnaroundTime = 0;
@@ -71,7 +71,7 @@ void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes)
 
     for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
     {
-        FCFSProcess *currentProcess = processes->at(i);
+        SJFProcess *currentProcess = processes->at(i);
         currentTurnaroundTime = currentProcess->completionTime - currentProcess->arrivalTime;
         currentWaitingTime = currentTurnaroundTime - currentProcess->burstTime;
         printf("Process %d: Waiting Time: %d Turnaround Time: %d\n",
@@ -82,7 +82,7 @@ void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes)
     printf("First Come First Serve\n\tAverage Waiting Time: %d\n\tAverageTurnaroundTime: %d\n", totalWaitingTime / NUMBER_OF_PROCESSES, totalTurnaroundTime / NUMBER_OF_PROCESSES);
 }
 
-void getSizeOfVector(std::vector<FCFSProcess *> *processes)
+void getSizeOfVector(std::vector<SJFProcess *> *processes)
 {
     for (auto i : *processes)
     {

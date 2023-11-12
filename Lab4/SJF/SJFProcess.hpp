@@ -1,22 +1,20 @@
 #pragma once
 
-class FCFSProcess
+class SJFProcess
 {
 public:
     int processNumber;
     int burstTime;
+    int remainingBurstTime;
     int arrivalTime;
     int completionTime;
     bool inReadyQueue;
-    FCFSProcess(int processNumber, int burstTime, int arrivalTime)
+    SJFProcess(int processNumber, int burstTime, int arrivalTime)
     {
         this->processNumber = processNumber;
         this->burstTime = burstTime;
         this->arrivalTime = arrivalTime;
         this->completionTime = 0;
         this->inReadyQueue = false;
-    };
-    FCFSProcess(){
-
     };
 };
