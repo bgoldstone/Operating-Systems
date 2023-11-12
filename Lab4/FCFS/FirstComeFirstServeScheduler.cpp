@@ -21,11 +21,14 @@ int main()
     getSizeOfVector(processes);
 
     if (NUMBER_OF_PROCESSES == 0)
+    {
+        std::cerr << "No Processes available for Scheduling!\n";
         exit(EXIT_FAILURE);
+    }
     FCFSScheduler(processes);
     printTurnaroundWaitingTime(processes);
-    
-    //Deallocate Memory
+
+    // Deallocate Memory
     for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
     {
         delete processes->at(i);
@@ -54,7 +57,7 @@ void FCFSScheduler(std::vector<FCFSProcess *> *processes)
             }
         }
         // if ready queue is empty don't do anything
-        if (readyQueue.size() == 0)
+        if (readyQueue.empty())
             continue;
         // Gets First Process in ReadyQueue and deletes it
         currentProcess = readyQueue.at(0);
@@ -72,8 +75,8 @@ void FCFSScheduler(std::vector<FCFSProcess *> *processes)
 void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes)
 {
 
-    int totalTurnaroundTime = 0;
-    int totalWaitingTime = 0;
+    double avgTurnaroundTime = 0;
+    double avgWaitingTime = 0;
 
     int currentTurnaroundTime, currentWaitingTime;
 
@@ -84,10 +87,12 @@ void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes)
         currentWaitingTime = currentTurnaroundTime - currentProcess->burstTime;
         printf("Process %d: Waiting Time: %d Turnaround Time: %d\n",
                currentProcess->processNumber, currentWaitingTime, currentTurnaroundTime);
-        totalWaitingTime += currentWaitingTime;
-        totalTurnaroundTime += currentTurnaroundTime;
+        avgWaitingTime = avgWaitingTime + currentWaitingTime;
+        avgTurnaroundTime = avgTurnaroundTime + currentTurnaroundTime;
     }
-    printf("First Come First Serve\n\tAverage Waiting Time: %d\n\tAverageTurnaroundTime: %d\n", totalWaitingTime / NUMBER_OF_PROCESSES, totalTurnaroundTime / NUMBER_OF_PROCESSES);
+    avgTurnaroundTime = avgTurnaroundTime / NUMBER_OF_PROCESSES;
+    avgWaitingTime = avgWaitingTime / NUMBER_OF_PROCESSES;
+    printf("First Come First Serve\n\tAverage Waiting Time: %.1f\n\tAverageTurnaroundTime: %.1f\n", avgWaitingTime, avgTurnaroundTime);
 }
 
 void getSizeOfVector(std::vector<FCFSProcess *> *processes)
