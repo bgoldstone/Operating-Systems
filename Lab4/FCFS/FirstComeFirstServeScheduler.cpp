@@ -20,10 +20,16 @@ int main()
 
     getSizeOfVector(processes);
 
-    if (processes->size() == 0)
+    if (NUMBER_OF_PROCESSES == 0)
         exit(EXIT_FAILURE);
     FCFSScheduler(processes);
     printTurnaroundWaitingTime(processes);
+    
+    //Deallocate Memory
+    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    {
+        delete processes->at(i);
+    }
     delete processes;
 
     return 0;
@@ -38,7 +44,6 @@ void FCFSScheduler(std::vector<FCFSProcess *> *processes)
 
     while (NUMBER_OF_PROCESSES != completedProcesses)
     {
-        int index = 0;
         for (auto it = processes->begin(); it != processes->end(); ++it)
         {
             currentProcess = *it;
@@ -48,16 +53,19 @@ void FCFSScheduler(std::vector<FCFSProcess *> *processes)
                 readyQueue.push_back(currentProcess);
             }
         }
-        // Removes Process
+        // if ready queue is empty don't do anything
+        if (readyQueue.size() == 0)
+            continue;
         // Gets First Process in ReadyQueue and deletes it
         currentProcess = readyQueue.at(0);
+        readyQueue.erase(readyQueue.begin());
         // Goes through Context Switch and Burst Time
         time += CONTEXT_SWITCH_TIME;
         time += currentProcess->burstTime;
         // Sets Completion Time
         currentProcess->completionTime = time;
+        // Adds 1 to Completed Processes
         completedProcesses++;
-        readyQueue.erase(readyQueue.begin());
     }
 }
 

@@ -16,5 +16,6 @@ public:
         this->arrivalTime = arrivalTime;
         this->completionTime = 0;
         this->inReadyQueue = false;
+        this->remainingBurstTime = burstTime;
     };
 };
