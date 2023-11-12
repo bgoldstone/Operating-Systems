@@ -15,6 +15,9 @@ int main()
     // processes->push_back(FCFSProcess(1, 24, 0));
     // processes->push_back(FCFSProcess(2, 3, 0));
     // processes->push_back(FCFSProcess(3, 3, 0));
+
+    if (processes->size() == 0)
+        exit(EXIT_FAILURE);
     FCFSScheduler(processes);
     printTurnaroundWaitingTime(processes);
     delete processes;
@@ -36,10 +39,10 @@ void FCFSScheduler(std::vector<FCFSProcess> *processes)
 void printTurnaroundWaitingTime(std::vector<FCFSProcess> *processes)
 {
     int numberOfProcesses = processes->size();
-    if (numberOfProcesses == 0)
-        exit(-1);
+
     int totalTurnaroundTime = 0;
     int totalWaitingTime = 0;
+
     int currentTurnaroundTime, currentWaitingTime;
 
     for (size_t i = 0; i < numberOfProcesses; i++)
