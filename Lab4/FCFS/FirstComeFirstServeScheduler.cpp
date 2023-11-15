@@ -1,104 +1,120 @@
 #include <vector>
 #include <iostream>
 #include "FCFSProcess.hpp"
+#include <queue>
 
 #ifndef CONTEXT_SWITCH_TIME
-#define CONTEXT_SWITCH_TIME 0;
+#define CONTEXT_SWITCH_TIME 0
 #endif
 
-void FCFSScheduler(std::vector<FCFSProcess *> *processes);
-void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes);
-void getSizeOfVector(std::vector<FCFSProcess *> *processes);
-int NUMBER_OF_PROCESSES = 0;
+void FCFSScheduler(std::vector<FCFSProcess *> &processes);
+void printTurnaroundWaitingTime(const std::vector<FCFSProcess *> &processes);
 
 int main()
 {
-    std::vector<FCFSProcess *> *processes = new std::vector<FCFSProcess *>;
-    processes->push_back(new FCFSProcess(1, 24, 0));
-    processes->push_back(new FCFSProcess(2, 3, 0));
-    processes->push_back(new FCFSProcess(3, 3, 0));
+    std::vector<FCFSProcess *> processes;
+    processes.push_back(new FCFSProcess(1, 24, 5));
+    processes.push_back(new FCFSProcess(2, 3, 2));
+    processes.push_back(new FCFSProcess(3, 3, 3));
 
-    getSizeOfVector(processes);
-
-    if (NUMBER_OF_PROCESSES == 0)
+    if (processes.empty())
     {
         std::cerr << "No Processes available for Scheduling!\n";
         exit(EXIT_FAILURE);
     }
+
     FCFSScheduler(processes);
     printTurnaroundWaitingTime(processes);
 
     // Deallocate Memory
-    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    for (auto process : processes)
     {
-        delete processes->at(i);
+        delete process;
     }
-    delete processes;
 
     return 0;
 }
 
-void FCFSScheduler(std::vector<FCFSProcess *> *processes)
+void FCFSScheduler(std::vector<FCFSProcess *> &processes)
 {
     int time = 0;
     int completedProcesses = 0;
-    std::vector<FCFSProcess *> readyQueue;
-    FCFSProcess *currentProcess;
+    std::queue<FCFSProcess *> readyQueue;
+    FCFSProcess *pPreviousProcess = nullptr;
+    bool contextSwitch = false;
+    int remainingContextSwitch = CONTEXT_SWITCH_TIME;
 
-    while (NUMBER_OF_PROCESSES != completedProcesses)
+    while (completedProcesses < processes.size())
     {
-        for (auto it = processes->begin(); it != processes->end(); ++it)
+        for (auto currentProcess : processes)
         {
-            currentProcess = *it;
-            if (currentProcess->arrivalTime <= time && !currentProcess->inReadyQueue)
+            // if process has arrived, put in ready queue.
+            if (currentProcess->arrivalTime == time && !currentProcess->inReadyQueue)
             {
                 currentProcess->inReadyQueue = true;
-                readyQueue.push_back(currentProcess);
+                readyQueue.push(currentProcess);
             }
         }
-        // if ready queue is empty don't do anything
+
         if (readyQueue.empty())
+        {
+            time++;
             continue;
-        // Gets First Process in ReadyQueue and deletes it
-        currentProcess = readyQueue.at(0);
-        readyQueue.erase(readyQueue.begin());
-        // Goes through Context Switch and Burst Time
-        time += CONTEXT_SWITCH_TIME;
-        time += currentProcess->burstTime;
-        // Sets Completion Time
-        currentProcess->completionTime = time;
-        // Adds 1 to Completed Processes
-        completedProcesses++;
+        }
+
+        FCFSProcess *pCurrentProcess = readyQueue.front();
+
+        if (CONTEXT_SWITCH_TIME > 0)
+        {
+            if (pCurrentProcess != pPreviousProcess && !contextSwitch)
+            {
+                contextSwitch = true;
+                remainingContextSwitch--;
+            }
+
+            if (contextSwitch && remainingContextSwitch == 0)
+            {
+                contextSwitch = false;
+                remainingContextSwitch = CONTEXT_SWITCH_TIME;
+            }
+        }
+
+        if (pCurrentProcess->remainingTime > 0)
+        {
+            time++;
+            pCurrentProcess->remainingTime--;
+        }
+        else
+        {
+            pCurrentProcess->completionTime = time++;
+            completedProcesses++;
+            pPreviousProcess = pCurrentProcess;
+            readyQueue.pop();
+            if (!readyQueue.empty())
+                readyQueue.front()->remainingTime--;
+        }
     }
 }
 
-void printTurnaroundWaitingTime(std::vector<FCFSProcess *> *processes)
+void printTurnaroundWaitingTime(const std::vector<FCFSProcess *> &processes)
 {
-
     double avgTurnaroundTime = 0;
     double avgWaitingTime = 0;
 
-    int currentTurnaroundTime, currentWaitingTime;
-
-    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    for (auto currentProcess : processes)
     {
-        FCFSProcess *currentProcess = processes->at(i);
-        currentTurnaroundTime = currentProcess->completionTime - currentProcess->arrivalTime;
-        currentWaitingTime = currentTurnaroundTime - currentProcess->burstTime;
+        int currentTurnaroundTime = currentProcess->completionTime - currentProcess->arrivalTime;
+        int currentWaitingTime = currentTurnaroundTime - currentProcess->burstTime;
+
         printf("Process %d: Waiting Time: %d Turnaround Time: %d\n",
                currentProcess->processNumber, currentWaitingTime, currentTurnaroundTime);
-        avgWaitingTime = avgWaitingTime + currentWaitingTime;
-        avgTurnaroundTime = avgTurnaroundTime + currentTurnaroundTime;
-    }
-    avgTurnaroundTime = avgTurnaroundTime / NUMBER_OF_PROCESSES;
-    avgWaitingTime = avgWaitingTime / NUMBER_OF_PROCESSES;
-    printf("First Come First Serve\n\tAverage Waiting Time: %.1f\n\tAverageTurnaroundTime: %.1f\n", avgWaitingTime, avgTurnaroundTime);
-}
 
-void getSizeOfVector(std::vector<FCFSProcess *> *processes)
-{
-    for (auto i : *processes)
-    {
-        NUMBER_OF_PROCESSES++;
+        avgWaitingTime += currentWaitingTime;
+        avgTurnaroundTime += currentTurnaroundTime;
     }
+
+    avgTurnaroundTime /= processes.size();
+    avgWaitingTime /= processes.size();
+
+    printf("First Come First Serve\n\tAverage Waiting Time: %.1f\n\tAverage Turnaround Time: %.1f\n", avgWaitingTime, avgTurnaroundTime);
 }
