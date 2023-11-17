@@ -9,6 +9,10 @@ public:
     int completionTime;
     bool inReadyQueue;
     int remainingBurstTime;
+    /// @brief Round Robin Process
+    /// @param processNumber Process Number
+    /// @param burstTime Process Burst Time
+    /// @param arrivalTime Process Arrival Time
     RRProcess(int processNumber, int burstTime, int arrivalTime)
     {
         this->processNumber = processNumber;

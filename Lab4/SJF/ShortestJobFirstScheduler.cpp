@@ -1,150 +1,138 @@
 #include <vector>
 #include <iostream>
 #include "SJFProcess.hpp"
+#include <queue>
+#include <algorithm>
 
 #ifndef CONTEXT_SWITCH_TIME
-#define CONTEXT_SWITCH_TIME 0;
+#define CONTEXT_SWITCH_TIME 0
 #endif
 
-void SJFScheduler(std::vector<SJFProcess *> *processes);
-void printTurnaroundWaitingTime(std::vector<SJFProcess *> *processes);
-void getSizeOfVector(std::vector<SJFProcess *> *processes);
-int NUMBER_OF_PROCESSES = 0;
+void SJFScheduler(std::vector<SJFProcess *> &processes);
+void printTurnaroundWaitingTime(std::vector<SJFProcess *> &processes);
 
 int main()
 {
-    std::vector<SJFProcess *> *processes = new std::vector<SJFProcess *>;
-    // processes->push_back(new SJFProcess(1, 6, 0));
-    // processes->push_back(new SJFProcess(2, 8, 2));
-    // processes->push_back(new SJFProcess(3, 7, 4));
-    // processes->push_back(new SJFProcess(4, 3, 5));
+    std::vector<SJFProcess *> processes;
 
-    processes->push_back(new SJFProcess(1, 6, 0));
-    processes->push_back(new SJFProcess(2, 8, 0));
-    processes->push_back(new SJFProcess(3, 7, 0));
-    processes->push_back(new SJFProcess(4, 3, 0));
+    // Test case 1
+    // processes.push_back(new SJFProcess(1, 6, 0));
+    // processes.push_back(new SJFProcess(2, 8, 2));
+    // processes.push_back(new SJFProcess(3, 7, 4));
+    // processes.push_back(new SJFProcess(4, 3, 5));
 
-    getSizeOfVector(processes);
+    // Test case 2
+    // processes.push_back(new SJFProcess(1, 6, 0));
+    // processes.push_back(new SJFProcess(2, 8, 0));
+    // processes.push_back(new SJFProcess(3, 7, 0));
+    // processes.push_back(new SJFProcess(4, 3, 0));
 
-    if (NUMBER_OF_PROCESSES == 0)
+    // Test Case 3
+    // processes.push_back(new SJFProcess(1, 3, 0));
+
+    if (processes.size() == 0)
     {
-        std::cerr << "No Processes available for Scheduling!\n";
+        std::cerr << "No processes available for Scheduling!\n";
         exit(EXIT_FAILURE);
     }
     SJFScheduler(processes);
     printTurnaroundWaitingTime(processes);
 
     // Deallocate Memory
-    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    SJFProcess *pProcess;
+    for (int i = 0; i < processes.size(); i++)
     {
-        delete processes->at(i);
+        pProcess = processes.at(i);
+        pProcess = nullptr;
+        delete pProcess;
     }
-    delete processes;
+    processes.clear();
 
     return 0;
 }
 
-void SJFScheduler(std::vector<SJFProcess *> *processes)
+/// @brief Shortest Job First Scheduler
+/// @param processes Vector of processes
+void SJFScheduler(std::vector<SJFProcess *> &processes)
 {
     int time = 0;
     int completedProcesses = 0;
-    int previousProcessNumber = -1;
     std::vector<SJFProcess *> readyQueue;
-    SJFProcess *currentProcess;
+    int smallestBurstTime = INT_MAX;
+    int shortestBurstProcess = -1;
+    int readyQueueIndex;
 
-    int smallestBurstTime, SJFProcess, readyQueueIndex;
-
-    // while not all processes are completed
-    while (NUMBER_OF_PROCESSES != completedProcesses)
+    while (completedProcesses < processes.size())
     {
-        // keeps track of process index
-        for (auto it = processes->begin(); it != processes->end(); ++it)
+        // Add arriving processes to the ready queue
+        for (auto &process : processes)
         {
-            currentProcess = *it;
-            if (currentProcess->arrivalTime <= time && !currentProcess->inReadyQueue)
+            if (process->arrivalTime <= time && !process->inReadyQueue)
             {
-                currentProcess->inReadyQueue = true;
-                readyQueue.push_back(currentProcess);
+                readyQueue.push_back(process);
+                process->inReadyQueue = true;
             }
         }
-        // if ready queue is empty don't do anything
-        if (readyQueue.empty())
-            continue;
-
-        // Finds SJF
-        smallestBurstTime = INT_MAX;
-        readyQueueIndex = 0;
-        for (auto it = readyQueue.begin(); it != readyQueue.end(); ++it)
+        if (!readyQueue.empty())
         {
-            currentProcess = *it;
-            // if smallest burst time so far
-            if (currentProcess->burstTime < smallestBurstTime)
+            SJFProcess *shortestProcess = nullptr;
+
+            readyQueueIndex = 0;
+            smallestBurstTime = INT_MAX;
+            // Find the process with the smallest burst time
+            for (auto process : readyQueue)
             {
-                smallestBurstTime = currentProcess->burstTime;
-                SJFProcess = readyQueueIndex;
+                if (process->burstTime < smallestBurstTime)
+                {
+                    smallestBurstTime = process->burstTime;
+                    shortestProcess = process;
+                }
             }
-            readyQueueIndex++;
-        }
+            // Remove the shortest process from the ready queue.
+            readyQueue.erase(std::remove(readyQueue.begin(), readyQueue.end(), shortestProcess), readyQueue.end());
 
-        // Gets First Process in ReadyQueue and removes it from ReadyQueue
-        currentProcess = readyQueue.at(SJFProcess);
-        readyQueue.erase(readyQueue.begin() + SJFProcess);
-        // Goes through Context Switch if applicable
-        if (previousProcessNumber != currentProcess->processNumber)
-        {
+            // Process the current process
             time += CONTEXT_SWITCH_TIME;
-            previousProcessNumber = currentProcess->processNumber;
-        }
-        time++;
-        // Changes Remaining Burst Time
-        currentProcess->remainingBurstTime--;
-        // Sets Completion Time if done and adds one to completed processes.
-        if (currentProcess->remainingBurstTime == 0)
-        {
-            currentProcess->completionTime = time;
+            time += shortestProcess->burstTime;
+
+            shortestProcess->completionTime = time;
             completedProcesses++;
         }
         else
         {
-            readyQueue.push_back(currentProcess);
+            time++;
         }
     }
 }
-
-void printTurnaroundWaitingTime(std::vector<SJFProcess *> *processes)
+/// @brief Prints the turnaround and waiting time for each process and the averages
+/// @param processes scheduled processes
+void printTurnaroundWaitingTime(std::vector<SJFProcess *> &processes)
 {
 
     double avgTurnaroundTime = 0;
     double avgWaitingTime = 0;
 
     int currentTurnaroundTime, currentWaitingTime;
-
-    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    SJFProcess *pCurrentProcess;
+    for (size_t i = 0; i < processes.size(); i++)
     {
         // Gets current process
-        SJFProcess *currentProcess = processes->at(i);
+        pCurrentProcess = processes.at(i);
 
         // Calculates Timing
-        currentTurnaroundTime = currentProcess->completionTime - currentProcess->arrivalTime;
-        currentWaitingTime = currentTurnaroundTime - currentProcess->burstTime;
+        currentTurnaroundTime = pCurrentProcess->completionTime - pCurrentProcess->arrivalTime;
+        currentWaitingTime = currentTurnaroundTime - pCurrentProcess->burstTime;
         // Prints Timing
         printf("Process %d: Waiting Time: %d Turnaround Time: %d\n",
-               currentProcess->processNumber, currentWaitingTime, currentTurnaroundTime);
+               pCurrentProcess->processNumber, currentWaitingTime, currentTurnaroundTime);
 
         // Adds to Average Timing
         avgWaitingTime += currentWaitingTime;
         avgTurnaroundTime += currentTurnaroundTime;
     }
     // Prints Average Times
-    avgWaitingTime /= NUMBER_OF_PROCESSES;
-    avgTurnaroundTime /= NUMBER_OF_PROCESSES;
-    printf("Shortest Job First\n\tAverage Waiting Time: %.1f\n\tAverageTurnaroundTime: %.1f\n", avgWaitingTime, avgTurnaroundTime);
-}
-
-void getSizeOfVector(std::vector<SJFProcess *> *processes)
-{
-    for (auto i : *processes)
-    {
-        NUMBER_OF_PROCESSES++;
-    }
+    avgWaitingTime /= processes.size();
+    avgTurnaroundTime /= processes.size();
+    printf("Shortest Job First\n\tAverage Waiting Time: %.1f\n\tAverage Turnaround Time: %.1f\n", avgWaitingTime, avgTurnaroundTime);
+    delete pCurrentProcess;
 }

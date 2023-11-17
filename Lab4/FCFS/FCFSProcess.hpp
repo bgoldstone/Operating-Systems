@@ -8,14 +8,19 @@ public:
     int arrivalTime;
     int completionTime;
     bool inReadyQueue;
-    int remainingTime;
+    int remainingBursts;
+
+    /// @brief Process Number
+    /// @param processNumber
+    /// @param burstTime Process Burst Time
+    /// @param arrivalTime Process Arrival Time
     FCFSProcess(int processNumber, int burstTime, int arrivalTime)
     {
         this->processNumber = processNumber;
         this->burstTime = burstTime;
         this->arrivalTime = arrivalTime;
         this->inReadyQueue = false;
-        this->remainingTime = burstTime;
+        this->remainingBursts = burstTime;
     };
     FCFSProcess(){
 

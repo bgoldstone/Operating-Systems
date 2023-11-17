@@ -6,27 +6,30 @@
 #define CONTEXT_SWITCH_TIME 0;
 #endif
 
-void SRTScheduler(std::vector<SRTProcess *> *processes);
-void printTurnaroundWaitingTime(std::vector<SRTProcess *> *processes);
-void getSizeOfVector(std::vector<SRTProcess *> *processes);
-int NUMBER_OF_PROCESSES = 0;
+void SRTScheduler(std::vector<SRTProcess *> &processes);
+void printTurnaroundWaitingTime(std::vector<SRTProcess *> &processes);
+void getSizeOfVector(std::vector<SRTProcess *> &processes);
 
 int main()
 {
-    std::vector<SRTProcess *> *processes = new std::vector<SRTProcess *>;
-    // processes->push_back(new SRTProcess(1, 8, 0));
-    // processes->push_back(new SRTProcess(2, 4, 1));
-    // processes->push_back(new SRTProcess(3, 9, 2));
-    // processes->push_back(new SRTProcess(4, 5, 3));
+    std::vector<SRTProcess *> processes;
 
-    // processes->push_back(new SRTProcess(1, 6, 0));
-    // processes->push_back(new SRTProcess(2, 8, 0));
-    // processes->push_back(new SRTProcess(3, 7, 0));
-    // processes->push_back(new SRTProcess(4, 3, 0));
+    // Test Case 1
+    // processes.push_back(new SRTProcess(1, 8, 0));
+    // processes.push_back(new SRTProcess(2, 4, 1));
+    // processes.push_back(new SRTProcess(3, 9, 2));
+    // processes.push_back(new SRTProcess(4, 5, 3));
 
-    getSizeOfVector(processes);
+    // Test Case 2
+    // processes.push_back(new SRTProcess(1, 6, 0));
+    // processes.push_back(new SRTProcess(2, 8, 0));
+    // processes.push_back(new SRTProcess(3, 7, 0));
+    // processes.push_back(new SRTProcess(4, 3, 0));
 
-    if (NUMBER_OF_PROCESSES == 0)
+    // Test Case 3
+    processes.push_back(new SRTProcess(4, 5, 3));
+
+    if (processes.size() == 0)
     {
         std::cerr << "No Processes available for Scheduling!\n";
         exit(EXIT_FAILURE);
@@ -35,16 +38,17 @@ int main()
     printTurnaroundWaitingTime(processes);
 
     // Deallocate Memory
-    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    for (size_t i = 0; i < processes.size(); i++)
     {
-        delete processes->at(i);
+        delete processes.at(i);
     }
-    delete processes;
 
     return 0;
 }
 
-void SRTScheduler(std::vector<SRTProcess *> *processes)
+/// @brief Shortest Remaining Time Scheduler
+/// @param processes Vector of SRT Processes
+void SRTScheduler(std::vector<SRTProcess *> &processes)
 {
     int time = 0;
     int completedProcesses = 0;
@@ -55,10 +59,10 @@ void SRTScheduler(std::vector<SRTProcess *> *processes)
     int smallestRemainingBurstTime, SRTProcess, readyQueueIndex;
 
     // while not all processes are completed
-    while (NUMBER_OF_PROCESSES != completedProcesses)
+    while (processes.size() != completedProcesses)
     {
         // keeps track of process index
-        for (auto it = processes->begin(); it != processes->end(); ++it)
+        for (auto it = processes.begin(); it != processes.end(); ++it)
         {
             currentProcess = *it;
             if (currentProcess->arrivalTime <= time && !currentProcess->inReadyQueue)
@@ -69,7 +73,10 @@ void SRTScheduler(std::vector<SRTProcess *> *processes)
         }
         // if ready queue is empty don't do anything
         if (readyQueue.empty())
+        {
+            time++;
             continue;
+        }
 
         // Finds SRT
         smallestRemainingBurstTime = INT_MAX;
@@ -111,18 +118,20 @@ void SRTScheduler(std::vector<SRTProcess *> *processes)
     }
 }
 
-void printTurnaroundWaitingTime(std::vector<SRTProcess *> *processes)
+/// @brief Prints Turnaround and Waiting Times
+/// @param processes scheduled processes
+void printTurnaroundWaitingTime(std::vector<SRTProcess *> &processes)
 {
-
+    
     double avgTurnaroundTime = 0;
     double avgWaitingTime = 0;
 
     int currentTurnaroundTime, currentWaitingTime;
 
-    for (size_t i = 0; i < NUMBER_OF_PROCESSES; i++)
+    for (size_t i = 0; i < processes.size(); i++)
     {
         // Gets current process
-        SRTProcess *currentProcess = processes->at(i);
+        SRTProcess *currentProcess = processes.at(i);
 
         // Calculates Timing
         currentTurnaroundTime = currentProcess->completionTime - currentProcess->arrivalTime;
@@ -136,15 +145,7 @@ void printTurnaroundWaitingTime(std::vector<SRTProcess *> *processes)
         avgTurnaroundTime += currentTurnaroundTime;
     }
     // Prints Average Times
-    avgWaitingTime /= NUMBER_OF_PROCESSES;
-    avgTurnaroundTime /= NUMBER_OF_PROCESSES;
-    printf("Shortest Remaining Time\n\tAverage Waiting Time: %.1f\n\tAverageTurnaroundTime: %.1f\n", avgWaitingTime, avgTurnaroundTime);
-}
-
-void getSizeOfVector(std::vector<SRTProcess *> *processes)
-{
-    for (auto i : *processes)
-    {
-        NUMBER_OF_PROCESSES++;
-    }
+    avgWaitingTime /= processes.size();
+    avgTurnaroundTime /= processes.size();
+    printf("Shortest Remaining Time\n\tAverage Waiting Time: %.1f\n\tAverage Turnaround Time: %.1f\n", avgWaitingTime, avgTurnaroundTime);
 }
