@@ -1,31 +1,31 @@
 #include <vector>
 #include <iostream>
-#include "FCFSProcess.hpp"
-#include <queue>
+#include "LCFSProcess.hpp"
+#include <stack>
 
 #ifndef CONTEXT_SWITCH_TIME
 #define CONTEXT_SWITCH_TIME 0
 #endif
 
-void LCFSScheduler(std::vector<FCFSProcess *> &pProcesses);
-void printTurnaroundWaitingTime(const std::vector<FCFSProcess *> &pProcesses);
+void LCFSScheduler(std::vector<LCFSProcess *> &pProcesses);
+void printTurnaroundWaitingTime(const std::vector<LCFSProcess *> &pProcesses);
 
 int main()
 {
-    std::vector<FCFSProcess *> processes;
+    std::vector<LCFSProcess *> processes;
 
     // Test Case 1
-    processes.push_back(new FCFSProcess(1, 24, 5));
-    processes.push_back(new FCFSProcess(2, 3, 2));
-    processes.push_back(new FCFSProcess(3, 3, 3));
+    processes.push_back(new LCFSProcess(1, 24, 5));
+    processes.push_back(new LCFSProcess(2, 3, 2));
+    processes.push_back(new LCFSProcess(3, 3, 3));
 
     // Test Case 2
-    // processes.push_back(new FCFSProcess(1, 24, 0));
-    // processes.push_back(new FCFSProcess(2, 3, 0));
-    // processes.push_back(new FCFSProcess(3, 3, 0));
+    // processes.push_back(new LCFSProcess(1, 24, 0));
+    // processes.push_back(new LCFSProcess(2, 3, 0));
+    // processes.push_back(new LCFSProcess(3, 3, 0));
 
     // Test Case 3
-    // processes.push_back(new FCFSProcess(1, 24, 10));
+    // processes.push_back(new LCFSProcess(1, 24, 10));
 
     if (processes.empty())
     {
@@ -47,12 +47,12 @@ int main()
 
 /// @brief Schedules processes using First Come First Serve algorithm.
 /// @param processes processes to schedule.
-void LCFSScheduler(std::vector<FCFSProcess *> &processes)
+void LCFSScheduler(std::vector<LCFSProcess *> &processes)
 {
     int time = 0;
     int completedProcesses = 0;
-    std::queue<FCFSProcess *> readyQueue;
-    FCFSProcess *pPreviousProcess = nullptr;
+    std::stack<LCFSProcess *> readyQueue;
+    LCFSProcess *pPreviousProcess = nullptr;
     bool contextSwitch = false;
     int remainingContextSwitch = CONTEXT_SWITCH_TIME;
 
@@ -78,7 +78,7 @@ void LCFSScheduler(std::vector<FCFSProcess *> &processes)
         }
 
         // Current Process
-        FCFSProcess *pCurrentProcess = readyQueue.front();
+        LCFSProcess *pCurrentProcess = readyQueue.top();
 
         // Context Switch Time
         if (CONTEXT_SWITCH_TIME > 0)
@@ -111,7 +111,7 @@ void LCFSScheduler(std::vector<FCFSProcess *> &processes)
             pPreviousProcess = pCurrentProcess;
             readyQueue.pop();
             if (!readyQueue.empty())
-                readyQueue.front()->remainingBursts;
+                readyQueue.top()->remainingBursts;
         }
     }
     pPreviousProcess = nullptr;
@@ -120,7 +120,7 @@ void LCFSScheduler(std::vector<FCFSProcess *> &processes)
 
 /// @brief Prints the turnaround and waiting time for each process and the averages.
 /// @param processes scheduled processes.
-void printTurnaroundWaitingTime(const std::vector<FCFSProcess *> &processes)
+void printTurnaroundWaitingTime(const std::vector<LCFSProcess *> &processes)
 {
     double avgTurnaroundTime = 0;
     double avgWaitingTime = 0;

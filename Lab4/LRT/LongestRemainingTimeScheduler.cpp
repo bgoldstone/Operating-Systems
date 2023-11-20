@@ -1,33 +1,33 @@
 #include <vector>
 #include <iostream>
-#include "SRTProcess.hpp"
+#include "LRTProcess.hpp"
 
 #ifndef CONTEXT_SWITCH_TIME
 #define CONTEXT_SWITCH_TIME 0;
 #endif
 
-void LRTScheduler(std::vector<SRTProcess *> &processes);
-void printTurnaroundWaitingTime(std::vector<SRTProcess *> &processes);
-void getSizeOfVector(std::vector<SRTProcess *> &processes);
+void LRTScheduler(std::vector<LRTProcess *> &processes);
+void printTurnaroundWaitingTime(std::vector<LRTProcess *> &processes);
+void getSizeOfVector(std::vector<LRTProcess *> &processes);
 
 int main()
 {
-    std::vector<SRTProcess *> processes;
+    std::vector<LRTProcess *> processes;
 
     // Test Case 1
-    // processes.push_back(new SRTProcess(1, 8, 0));
-    // processes.push_back(new SRTProcess(2, 4, 1));
-    // processes.push_back(new SRTProcess(3, 9, 2));
-    // processes.push_back(new SRTProcess(4, 5, 3));
+    // processes.push_back(new LRTProcess(1, 8, 0));
+    // processes.push_back(new LRTProcess(2, 4, 1));
+    // processes.push_back(new LRTProcess(3, 9, 2));
+    // processes.push_back(new LRTProcess(4, 5, 3));
 
     // Test Case 2
-    // processes.push_back(new SRTProcess(1, 6, 0));
-    // processes.push_back(new SRTProcess(2, 8, 0));
-    // processes.push_back(new SRTProcess(3, 7, 0));
-    // processes.push_back(new SRTProcess(4, 3, 0));
+    processes.push_back(new LRTProcess(1, 6, 0));
+    processes.push_back(new LRTProcess(2, 8, 0));
+    processes.push_back(new LRTProcess(3, 7, 0));
+    processes.push_back(new LRTProcess(4, 3, 0));
 
     // Test Case 3
-    processes.push_back(new SRTProcess(4, 5, 3));
+    // processes.push_back(new LRTProcess(4, 5, 3));
 
     if (processes.size() == 0)
     {
@@ -48,15 +48,15 @@ int main()
 
 /// @brief Shortest Remaining Time Scheduler
 /// @param processes Vector of SRT Processes
-void LRTScheduler(std::vector<SRTProcess *> &processes)
+void LRTScheduler(std::vector<LRTProcess *> &processes)
 {
     int time = 0;
     int completedProcesses = 0;
     int previousProcessNumber = -1;
-    std::vector<SRTProcess *> readyQueue;
-    SRTProcess *currentProcess;
+    std::vector<LRTProcess *> readyQueue;
+    LRTProcess *currentProcess;
 
-    int smallestRemainingBurstTime, SRTProcess, readyQueueIndex;
+    int longestRemainingBurstTime, LRTProcess, readyQueueIndex;
 
     // while not all processes are completed
     while (processes.size() != completedProcesses)
@@ -78,24 +78,24 @@ void LRTScheduler(std::vector<SRTProcess *> &processes)
             continue;
         }
 
-        // Finds SRT
-        smallestRemainingBurstTime = INT_MAX;
+        // Finds LRT
+        longestRemainingBurstTime = INT_MIN;
         readyQueueIndex = 0;
         for (auto it = readyQueue.begin(); it != readyQueue.end(); ++it)
         {
             currentProcess = *it;
             // if smallest burst time so far
-            if (currentProcess->remainingBurstTime < smallestRemainingBurstTime)
+            if (currentProcess->remainingBurstTime > longestRemainingBurstTime)
             {
-                smallestRemainingBurstTime = currentProcess->burstTime;
-                SRTProcess = readyQueueIndex;
+                longestRemainingBurstTime = currentProcess->burstTime;
+                LRTProcess = readyQueueIndex;
             }
             readyQueueIndex++;
         }
 
         // Gets First Process in ReadyQueue and removes it from ReadyQueue
-        currentProcess = readyQueue.at(SRTProcess);
-        readyQueue.erase(readyQueue.begin() + SRTProcess);
+        currentProcess = readyQueue.at(LRTProcess);
+        readyQueue.erase(readyQueue.begin() + LRTProcess);
         // Goes through Context Switch if applicable
         if (previousProcessNumber != currentProcess->processNumber)
         {
@@ -120,9 +120,9 @@ void LRTScheduler(std::vector<SRTProcess *> &processes)
 
 /// @brief Prints Turnaround and Waiting Times
 /// @param processes scheduled processes
-void printTurnaroundWaitingTime(std::vector<SRTProcess *> &processes)
+void printTurnaroundWaitingTime(std::vector<LRTProcess *> &processes)
 {
-    
+
     double avgTurnaroundTime = 0;
     double avgWaitingTime = 0;
 
@@ -131,7 +131,7 @@ void printTurnaroundWaitingTime(std::vector<SRTProcess *> &processes)
     for (size_t i = 0; i < processes.size(); i++)
     {
         // Gets current process
-        SRTProcess *currentProcess = processes.at(i);
+        LRTProcess *currentProcess = processes.at(i);
 
         // Calculates Timing
         currentTurnaroundTime = currentProcess->completionTime - currentProcess->arrivalTime;
@@ -147,5 +147,5 @@ void printTurnaroundWaitingTime(std::vector<SRTProcess *> &processes)
     // Prints Average Times
     avgWaitingTime /= processes.size();
     avgTurnaroundTime /= processes.size();
-    printf("Shortest Remaining Time\n\tAverage Waiting Time: %.1f\n\tAverage Turnaround Time: %.1f\n", avgWaitingTime, avgTurnaroundTime);
+    printf("Longest Remaining Time\n\tAverage Waiting Time: %.1f\n\tAverage Turnaround Time: %.1f\n", avgWaitingTime, avgTurnaroundTime);
 }
