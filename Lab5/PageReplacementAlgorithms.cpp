@@ -73,6 +73,10 @@ void printFrames(int frames[], int pageFaults)
     std::cout << output << std::endl;
 }
 
+/// @brief Finds the index of a given value in an array.
+/// @param arr a pointer to an array of integers
+/// @param value the value to search for in the array
+/// @return the index of the value in the array, or -1 if the value was not found
 int indexOf(const int *arr, int value)
 {
     for (int i = 0; i < NUMBER_OF_FRAMES; i++)
