@@ -2,22 +2,20 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <algorithm>
 
-void printFrames(int frames[]);
-int indexOf(int arr[], int value);
-int findLeastRecentlyUsed(std::map<int, int> &frameMap, int frames[]);
 int FIFOPageReplacement(std::vector<int> &inputSequence);
 int OptimalPageReplacement(std::vector<int> &inputSequence);
 int LeastRecentlyUsedPageReplacement(std::vector<int> &inputSequence);
 
-int NUMBER_OF_FRAMES;
+unsigned int NUMBER_OF_FRAMES;
 
 int main()
 {
     std::vector<int> inputSequence;
     std::string inputLine;
 
-    std::cout << "Hello! Welcome to the Memory Page Replacement Algorithm!!\n"
+    std::cout << "Hello! Welcome to the Memory Page Replacement Algorithm!\n"
               << std::endl;
 
     // Get number of frames
@@ -61,32 +59,38 @@ int main()
 /// @param pageFaults number of page faults that have occurred
 void printFrames(int frames[], int pageFaults)
 {
-
+    std::string output = "";
     for (int i = 0; i < NUMBER_OF_FRAMES; i++)
     {
         if (i < pageFaults)
         {
-            std::cout << frames[i] << " ";
-            continue;
+            output += std::to_string(frames[i]) + " ";
         }
-        std::cout << "  ";
+        else
+        {
+            output += "  ";
+        }
     }
-    std::cout << std::endl;
+    std::cout << output << std::endl;
 }
 
 /// @brief Finds the index of a value in an array
 /// @param arr array to search
 /// @param value value to search for
 /// @return index of value in array, -1 if not found
-int indexOf(int arr[], int value)
+int indexOf(const int *arr, int value)
 {
-    for (int i = 0; i < NUMBER_OF_FRAMES; i++)
+    // Find the iterator pointing to the value in the array
+    auto it = std::find(arr, arr + NUMBER_OF_FRAMES, value);
+
+    // If the value is found in the array
+    if (it != arr + NUMBER_OF_FRAMES)
     {
-        if (arr[i] == value)
-        {
-            return i;
-        }
+        // Calculate the index of the value in the array
+        return std::distance(arr, it);
     }
+
+    // If the value is not found in the array
     return -1;
 }
 
@@ -94,19 +98,30 @@ int indexOf(int arr[], int value)
 /// @param frameMap map of frames and values
 /// @param allFrames array of frames that are currently in use
 /// @return the index of the least recently used frame
-int findLeastRecentlyUsed(std::map<int, int> &frameMap, int allFrames[])
+int findLeastRecentlyUsed(const std::map<int, int> &frameMap, const int *allFrames)
 {
-    int leastRecentlyUsedFrame;
+    // Initialize variables to store the least recently used frame and its corresponding value
     int leastRecentlyUsedValue = INT_MAX;
-    for (const auto &[frame, value] : frameMap)
+    int leastRecentlyUsedFrame = -1;
+
+    // Iterate over each frame in the frameMap
+    for (auto it = frameMap.begin(); it != frameMap.end(); ++it)
     {
-        // if value is less than least recently used value and frame is in use, set it as least recently used.
+        // Get the frame and value from the current iterator
+        int frame = it->first;
+        int value = it->second;
+
+        // Check if the value is less than the current leastRecentlyUsedValue
+        // and if the frame is present in the allFrames array
         if (value < leastRecentlyUsedValue && indexOf(allFrames, frame) != -1)
         {
+            // Update the leastRecentlyUsedValue and leastRecentlyUsedFrame
             leastRecentlyUsedValue = value;
             leastRecentlyUsedFrame = frame;
         }
     }
+
+    // Find the index of the least recently used frame in the allFrames array
     return indexOf(allFrames, leastRecentlyUsedFrame);
 }
 
@@ -119,12 +134,12 @@ int FIFOPageReplacement(std::vector<int> &inputSequence)
     int nextFrame = 0;
     int allFrames[NUMBER_OF_FRAMES];
     // for each input
-    for (int i = 0; i < inputSequence.size(); i++)
+    for (int page : inputSequence)
     {
         // if frame not in memory, remove the oldest frame.
-        if (indexOf(allFrames, inputSequence[i]) == -1)
+        if (indexOf(allFrames, page) == -1)
         {
-            allFrames[nextFrame] = inputSequence[i];
+            allFrames[nextFrame] = page;
             nextFrame = (nextFrame + 1) % NUMBER_OF_FRAMES;
             pageFaults++;
             printf("Page Fault #%d frames: ", pageFaults);
@@ -143,15 +158,15 @@ int OptimalPageReplacement(std::vector<int> &inputSequence)
     int nextFrame = 0;
     int allFrames[NUMBER_OF_FRAMES];
     // for each input
-    for (int i = 0; i < inputSequence.size(); i++)
+    for (int page : inputSequence)
     {
         // if frame not in memory, remove the least relevant frame.
-        if (indexOf(allFrames, inputSequence[i]) == -1)
+        if (indexOf(allFrames, page) == -1)
         {
             // if all frames are not in use
             if (pageFaults < NUMBER_OF_FRAMES)
             {
-                allFrames[pageFaults] = inputSequence[i];
+                allFrames[pageFaults] = page;
             }
             else
             {
@@ -161,7 +176,7 @@ int OptimalPageReplacement(std::vector<int> &inputSequence)
                 {
                     int currentFrame = allFrames[j];
                     // for each input post-current input sequence
-                    for (int k = i; k < inputSequence.size(); k++)
+                    for (int k = page; k < inputSequence.size(); k++)
                     {
                         // if this frame is the least optimal frame yet, set it to be the leastOptimal.
                         if (currentFrame == inputSequence[k] && k > leastOptimal)
@@ -178,7 +193,7 @@ int OptimalPageReplacement(std::vector<int> &inputSequence)
 
                     frameToRemove = indexOf(allFrames, inputSequence[leastOptimal]);
                 }
-                allFrames[frameToRemove] = inputSequence[i];
+                allFrames[frameToRemove] = page;
             }
             pageFaults++;
             printf("Page Fault #%d frames: ", pageFaults);
@@ -193,7 +208,6 @@ int OptimalPageReplacement(std::vector<int> &inputSequence)
 int LeastRecentlyUsedPageReplacement(std::vector<int> &inputSequence)
 {
     int pageFaults = 0;
-    int nextFrame = 0;
     int allFrames[NUMBER_OF_FRAMES];
     std::map<int, int> frameMap;
 
