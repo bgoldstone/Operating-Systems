@@ -2,7 +2,6 @@
 #include <vector>
 #include <sstream>
 #include <map>
-#include <algorithm>
 
 int FIFOPageReplacement(std::vector<int> &inputSequence);
 int OptimalPageReplacement(std::vector<int> &inputSequence);
@@ -74,23 +73,15 @@ void printFrames(int frames[], int pageFaults)
     std::cout << output << std::endl;
 }
 
-/// @brief Finds the index of a value in an array
-/// @param arr array to search
-/// @param value value to search for
-/// @return index of value in array, -1 if not found
 int indexOf(const int *arr, int value)
 {
-    // Find the iterator pointing to the value in the array
-    auto it = std::find(arr, arr + NUMBER_OF_FRAMES, value);
-
-    // If the value is found in the array
-    if (it != arr + NUMBER_OF_FRAMES)
+    for (int i = 0; i < NUMBER_OF_FRAMES; i++)
     {
-        // Calculate the index of the value in the array
-        return std::distance(arr, it);
+        if (arr[i] == value)
+        {
+            return i;
+        }
     }
-
-    // If the value is not found in the array
     return -1;
 }
 
